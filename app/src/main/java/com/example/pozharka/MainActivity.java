@@ -22,7 +22,10 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -35,10 +38,9 @@ import android.speech.tts.TextToSpeech;
 import java.util.List;
 import java.util.Locale;
 
-
 public class MainActivity extends AppCompatActivity {
 
-        public  ArrayList<HashMap<String , String>> egugstrength = new ArrayList<>();
+        public  ArrayList<Item> egug = new ArrayList<Item>();
         public  List<ScanResult> results;
         public  ArrayList<String> bss = new ArrayList<>();
         public  ArrayList<String> cabs = new ArrayList<>();
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void zhighoul(View view) {
             tts.speak("uvu давай заведем старый жигуль? " +
-                    "вивививививививививививививививививививививививививививививививививививививививививививививививививививипрпрпррпрвививививививививививививиhfgckgyjkxjdyt " +
+                    "вивививививививививививививививививививививививививививививививививививививививививививививививививививипрпрпррпрвививививививививививививи " +
                     "Марат Радикович не сидите давайте помогайте до гаража толкать может там он заведётся.]", TextToSpeech.QUEUE_FLUSH, null);
         }
 
@@ -202,7 +204,10 @@ public class MainActivity extends AppCompatActivity {
                         tts.speak("Направляйтесь к выходу из кабинета, поверните налево, через несколько метров по правой стене вы увидите лестницу",
                                 TextToSpeech.QUEUE_FLUSH, null);
                     }
-
+                    if (cab.equals("215")) {
+                        tts.speak("Направляйтесь к выходу из кабинета, поверните направо, через несколько метров по правой стене вы увидите лестницу",
+                                TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
 
                 currentlayout = "main";
@@ -210,17 +215,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void scan() {
-            egugstrength.clear();
+            egug.clear();
             cab=" ";
             WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
             wifiManager.startScan();
         }
 
-        public SimpleAdapter liw(){
+        public adap liw(){
 
-            final SimpleAdapter adapter =  new SimpleAdapter(this, egugstrength, android.R.layout.simple_list_item_2,
-                    new String[]{"name", "strength"}, new int[]{android.R.id.text1, android.R.id.text2});
+            final adap adapter =  new adap(this, egug);
 
             return (adapter);
         }
@@ -233,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 results = wifiManager.getScanResults();
                 unregisterReceiver(this);
 
-                SimpleAdapter ad = liw();
+                adap ad = liw();
 
                 if (currentlayout.equals("list")) {
                     ListView lw = findViewById(R.id.wifilist);
@@ -273,11 +277,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for(ScanResult scanResult : results ) {
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put("name", "bssid: " + scanResult.BSSID);
-                    map.put("strength", "strength: " + scanResult.level);
 
-                    egugstrength.add(map);
+                    egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " + scanResult.level));
 
                     if (currentlayout.equals("quest")) {
                         if ((scanResult.level > maxlev1) & (bss.indexOf(scanResult.BSSID.substring(0, 15))!=-1)) {
