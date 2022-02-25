@@ -202,10 +202,7 @@ public class MainActivity extends AppCompatActivity {
                         tts.speak("Направляйтесь к выходу из кабинета, поверните налево, через несколько метров по правой стене вы увидите лестницу",
                                 TextToSpeech.QUEUE_FLUSH, null);
                     }
-                    if (cab.equals("215")) {
-                        tts.speak("Направляйтесь к выходу из кабинета, поверните направо, через несколько метров по правой стене вы увидите лестницу",
-                                TextToSpeech.QUEUE_FLUSH, null);
-                    }
+
                 }
 
                 currentlayout = "main";
