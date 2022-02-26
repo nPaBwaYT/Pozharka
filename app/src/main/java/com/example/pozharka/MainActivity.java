@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -291,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+                Collections.sort(egug, Item.COMPARE_BY_STRENGTRH);
                 ad.notifyDataSetChanged();
 
                 if (currentlayout.equals("quest")){

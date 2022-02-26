@@ -1,5 +1,7 @@
 package com.example.pozharka;
 
+import java.util.Comparator;
+
 public class Item {
 
     String SSID;
@@ -35,4 +37,10 @@ public class Item {
     public void setstrength(String strength) {
         this.strength = strength;
     }
+    public static final Comparator<Item> COMPARE_BY_STRENGTRH = new Comparator<Item>() {
+        @Override
+        public int compare(Item lhs, Item rhs) {
+            return lhs.getstrength().compareTo(rhs.getstrength());
+        }
+    };
 }
