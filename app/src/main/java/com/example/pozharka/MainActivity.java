@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                Collections.sort(egug, Item.COMPARE_BY_STRENGTRH);
+                Collections.sort(egug, Item.COMPARE_BY_STRENGTH);
                 ad.notifyDataSetChanged();
 
                 if (currentlayout.equals("quest")){
