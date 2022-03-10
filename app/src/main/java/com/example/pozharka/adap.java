@@ -48,10 +48,12 @@ public class adap extends BaseAdapter {
         TextView SSID = (TextView) someView.findViewById(R.id.SSID);
         TextView BSSID = (TextView) someView.findViewById(R.id.BSSID);
         TextView strength = (TextView) someView.findViewById(R.id.strength);
+        TextView cab = (TextView) someView.findViewById(R.id.cab);
 
         SSID.setText(egug.get(i).SSID);
         BSSID.setText(egug.get(i).BSSID);
         strength.setText(egug.get(i).strength);
+        cab.setText(egug.get(i).cab);
         return someView;
     }
 }

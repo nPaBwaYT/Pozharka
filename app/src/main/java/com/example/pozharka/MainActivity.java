@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+            //Полноэкранный режим
             View decorView = getWindow().getDecorView();
             int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
             WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
+            //Инициализация ттс
             tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
                 @Override
                 public void onInit(int status) {
@@ -92,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
             if (!wifiManager.isWifiEnabled()) {
                 wifiManager.setWifiEnabled(true);
             }
+
+            //Создание файла-базы (по-хорошему поменять бы способ создания)
             FileOutputStream fos = null;
             try {
                 String text = "00:f6:63:d7:31: 206\n" +
@@ -106,19 +110,36 @@ public class MainActivity extends AppCompatActivity {
 
                 fos = openFileOutput("bssids.txt", MODE_PRIVATE);
                 fos.write(text.getBytes());
-            } catch (IOException ex) {
-                setContentView(R.layout.activity_main);
-                currentlayout = "main";
-            } finally {
+            } catch (IOException ex) {}
+            finally {
                 try {
                     if (fos != null)
                         fos.close();
-                } catch (IOException ex) {
-                    setContentView(R.layout.activity_main);
-                    currentlayout = "main";
-                }
+                } catch (IOException ex) {}
             }
 
+            //Разделение базы на 2 списка bss и cabs
+            FileInputStream fin = null;
+            try {
+                fin = openFileInput("bssids.txt");
+                byte[] bytes = new byte[fin.available()];
+                fin.read(bytes);
+                String text1 = new String(bytes);
+                String[] base = text1.split("\n");
+
+                for (int i = 0; i < base.length; i++) {
+                    bss.add(base[i].split(" ")[0]);
+                    cabs.add(base[i].split(" ")[1]);
+                }
+            } catch (IOException ex) {}
+            finally {
+                try {
+                    if (fin != null)
+                        fin.close();
+                } catch (IOException ex) {}
+            }
+
+            //Запрос разрешения
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -126,28 +147,31 @@ public class MainActivity extends AppCompatActivity {
                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             }
-
-            LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            boolean geoloc = gps && nw;
-            if (! geoloc){
-                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            }
-
-            potok.start();
-        }
-
-        public void btonClick(View view) {
-            if (!cab.equals(" ")){
-                setContentView(R.layout.questions);
-                currentlayout = "quest";
-
-                questact();
+            else { //Включение геолокации
+                LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                boolean geoloc = gps && nw;
+                if (! geoloc){
+                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                }
+                else{
+                    //Запуск сканирования
+                    potok.start();
+                }
             }
         }
 
-        public void btonClick2(View view) {
+        public void start(View view) {
+
+            setContentView(R.layout.questions);
+            currentlayout = "quest";
+
+            questact();
+
+        }
+
+        public void reset(View view) {
 
             ImageView leg = findViewById(R.id.legend);
             ImageView iv = findViewById(R.id.iv);
@@ -156,19 +180,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void gotolist(View view) {
-            if (!cab.equals(" ")){
-                setContentView(R.layout.list);
-                currentlayout = "list";
 
-                listact();
-            }
+            setContentView(R.layout.list);
+            currentlayout = "list";
+            listact();
+
         }
 
         public void goback(View view) {
-            if (! cab.equals(" ")) {
-                setContentView(R.layout.activity_main);
-                currentlayout = "main";
-            }
+
+            setContentView(R.layout.activity_main);
+            currentlayout = "main";
+
         }
 
         public void zhighoul(View view) {
@@ -181,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
             if ((! cab.equals(" ")) & (currentlayout.equals("quest"))){
                 setContentView(R.layout.activity_main);
 
+                //Разговоры и вывод маршрута
                 if (! cab.equals("")) {
                     ImageView iv = findViewById(R.id.iv);
                     ImageView leg = findViewById(R.id.legend);
@@ -214,7 +238,6 @@ public class MainActivity extends AppCompatActivity {
                                 TextToSpeech.QUEUE_FLUSH, null);
                     }
                 }
-
                 currentlayout = "main";
             }
         }
@@ -232,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
             return (adapter);
         }
 
+        //Код вкладки списка
         public void listact(){
             if (currentlayout.equals("list")) {
                 adap ad = liw();
@@ -242,39 +266,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        //Код вкладки вопроса
         public void questact() {
 
-            FileInputStream fin = null;
-            TextView tq = findViewById(R.id.tquest);
-            try {
-                fin = openFileInput("bssids.txt");
-                byte[] bytes = new byte[fin.available()];
-                fin.read(bytes);
-                String text1 = new String(bytes);
-                String[] base = text1.split("\n");
-
-                for (int i = 0; i < base.length; i++) {
-                    bss.add(base[i].split(" ")[0]);
-                    cabs.add(base[i].split(" ")[1]);
-                }
-
-            } catch (IOException ex) {} finally {
-                try {
-                    if (fin != null)
-                        fin.close();
-                } catch (IOException ex) {}
-            }
-
-            for (ScanResult scanResult : results) {
-                if ((scanResult.level > maxlev1) & (bss.indexOf(scanResult.BSSID.substring(0, 15)) != -1)) {
-                    maxlev1 = scanResult.level;
-                    rbssid1 = scanResult.BSSID;
-                    rssid1 = scanResult.SSID;
-                    cab = cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)));
-                }
-            }
-
             if (currentlayout.equals("quest")) {
+                TextView tq = findViewById(R.id.tquest);
 
                 tq.setText("Вы находитесь внутри кабинета?");
                 tts.speak("Вы находитесь внутри кабинета?", TextToSpeech.QUEUE_FLUSH, null);
@@ -301,39 +297,56 @@ public class MainActivity extends AppCompatActivity {
                 cab = " ";
                 egug.clear();
 
+                //Загон всех Item'ов, содержащих резельтаты скана и кабинет, в массив egug
                 for (ScanResult scanResult : results) {
-                    egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " + scanResult.level));
+                    if (!(bss.indexOf(scanResult.BSSID.substring(0, 15)) == -1)){
+                        egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " +
+                                scanResult.level, "cab: " +  cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)))));
+                    }
+                    else {
+                        egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " +
+                                scanResult.level, "cab: none"));
+                    }
                 }
 
                 Collections.sort(egug, Item.COMPARE_BY_STRENGTH);
 
+                //Определение кабинета, из которого идёт сильнейший сигнал
+                for (int i = 0; i < egug.size(); i++) {
+                    if (!egug.get(i).getcab().equals("cab: none")) {
+                        cab = egug.get(i).getcab().substring(5);
+                        break;
+                    }
+                }
+
                 questact();
+                listact();
 
                 if (cab.equals(" ")) {
                     cab = "";
                 }
-
-                listact();
             }
         };
 
+        //Поток (фоновое сканирование)
         Runnable r = new Runnable(){
             @Override
             public void run() {
-                for (int i = 0; i < 1000; i++) {
+                while (true) {
                     try {
                         scan();
                         potok.sleep(3000);
                         if (currentlayout.equals("list")){
                             potok.sleep(7000);
                         }
-                    } catch (InterruptedException e) { }
+                    } catch (InterruptedException e) {}
                 }
             }
         };
 
         Thread  potok = new Thread(r, "scaner");
 
+        //Обработка ответа пользователя на разрешение
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
             switch (requestCode) {

@@ -7,11 +7,13 @@ public class Item {
     String SSID;
     String BSSID;
     String strength;
+    String cab;
 
-    Item(String ls, String lbs, String lst) {
+    Item(String ls, String lbs, String lst, String cb) {
         this.SSID = ls;
         this.BSSID = lbs;
         this.strength = lst;
+        this.cab = cb;
     }
 
     public String getSSID() {
@@ -20,6 +22,14 @@ public class Item {
 
     public void setSSID(String SSID) {
         this.SSID = SSID;
+    }
+
+    public String getcab() {
+        return cab;
+    }
+
+    public void setcab(String cab) {
+        this.cab = cab;
     }
 
     public String getBSSID() {
