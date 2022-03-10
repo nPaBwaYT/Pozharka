@@ -37,6 +37,7 @@ public class Item {
     public void setstrength(String strength) {
         this.strength = strength;
     }
+
     public static final Comparator<Item> COMPARE_BY_STRENGTH = new Comparator<Item>() {
         @Override
         public int compare(Item lhs, Item rhs) {

@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             Log.e("TTS", "Failed");
                         }
-                    } else {
+                        } else {
                         Log.e("TTS", "Failed");
                     }
                 }
@@ -99,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
                         "2c:33:11:f8:86: 210\n" +
                         "cc:16:7e:96:cb: 211\n" +
                         "00:f6:63:97:19: 212\n" +
-                        "b8:11:4b:93:4a: 215";
+                        "b8:11:4b:93:4a: 215\n" +
+                        "c0:c9:e3:08:bc: дом\n" +
+                        "c8:d3:ff:59:05: принтер";
 
                 fos = openFileOutput("bssids.txt", MODE_PRIVATE);
                 fos.write(text.getBytes());
@@ -131,12 +134,17 @@ public class MainActivity extends AppCompatActivity {
             if (! geoloc){
                 startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             }
+
+            potok.start();
         }
 
         public void btonClick(View view) {
-            setContentView(R.layout.questions);
-            currentlayout = "quest";
-            scan();
+            if (!cab.equals(" ")){
+                setContentView(R.layout.questions);
+                currentlayout = "quest";
+
+                questact();
+            }
         }
 
         public void btonClick2(View view) {
@@ -148,11 +156,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void gotolist(View view) {
+            if (!cab.equals(" ")){
+                setContentView(R.layout.list);
+                currentlayout = "list";
 
-            setContentView(R.layout.list);
-            currentlayout = "list";
-
-            scan();
+                listact();
+            }
         }
 
         public void goback(View view) {
@@ -211,8 +220,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void scan() {
-            egug.clear();
-            cab=" ";
             WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
             wifiManager.startScan();
@@ -225,6 +232,61 @@ public class MainActivity extends AppCompatActivity {
             return (adapter);
         }
 
+        public void listact(){
+            if (currentlayout.equals("list")) {
+                adap ad = liw();
+                ListView lw = findViewById(R.id.wifilist);
+                lw.setAdapter(ad);
+
+                ad.notifyDataSetChanged();
+            }
+        }
+
+        public void questact() {
+
+            FileInputStream fin = null;
+            TextView tq = findViewById(R.id.tquest);
+            try {
+                fin = openFileInput("bssids.txt");
+                byte[] bytes = new byte[fin.available()];
+                fin.read(bytes);
+                String text1 = new String(bytes);
+                String[] base = text1.split("\n");
+
+                for (int i = 0; i < base.length; i++) {
+                    bss.add(base[i].split(" ")[0]);
+                    cabs.add(base[i].split(" ")[1]);
+                }
+
+            } catch (IOException ex) {} finally {
+                try {
+                    if (fin != null)
+                        fin.close();
+                } catch (IOException ex) {}
+            }
+
+            for (ScanResult scanResult : results) {
+                if ((scanResult.level > maxlev1) & (bss.indexOf(scanResult.BSSID.substring(0, 15)) != -1)) {
+                    maxlev1 = scanResult.level;
+                    rbssid1 = scanResult.BSSID;
+                    rssid1 = scanResult.SSID;
+                    cab = cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)));
+                }
+            }
+
+            if (currentlayout.equals("quest")) {
+
+                tq.setText("Вы находитесь внутри кабинета?");
+                tts.speak("Вы находитесь внутри кабинета?", TextToSpeech.QUEUE_FLUSH, null);
+
+                if (cab.equals(" ")) {
+                    tts.speak("Вы не находитесь в контролируемой территории", TextToSpeech.QUEUE_FLUSH, null);
+                    setContentView(R.layout.activity_main);
+                    currentlayout = "main";
+                }
+            }
+        }
+
         BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -233,80 +295,44 @@ public class MainActivity extends AppCompatActivity {
                 results = wifiManager.getScanResults();
                 unregisterReceiver(this);
 
-                adap ad = liw();
-
-                if (currentlayout.equals("list")) {
-                    ListView lw = findViewById(R.id.wifilist);
-                    lw.setAdapter(ad);
-                }
-
                 maxlev1 = -198;
-                rbssid1 =" ";
-                rssid1 =" ";
-                cab =" ";
+                rbssid1 = " ";
+                rssid1 = " ";
+                cab = " ";
+                egug.clear();
 
-                if (currentlayout.equals("quest")) {
-                    FileInputStream fin = null;
-                    TextView tq = findViewById(R.id.tquest);
-                    try {
-                        fin = openFileInput("bssids.txt");
-                        byte[] bytes = new byte[fin.available()];
-                        fin.read(bytes);
-                        String text1 = new String(bytes);
-                        String[] base = text1.split("\n");
-
-                        for (int i = 0; i < base.length; i++) {
-                            bss.add(base[i].split(" ")[0]);
-                            cabs.add(base[i].split(" ")[1]);
-                        }
-
-                    } catch (IOException ex) {
-                        tq.setText(ex.getMessage());
-                    } finally {
-                        try {
-                            if (fin != null)
-                                fin.close();
-                        } catch (IOException ex) {
-                            tq.setText(ex.getMessage());
-                        }
-                    }
-                }
-
-                for(ScanResult scanResult : results ) {
-
+                for (ScanResult scanResult : results) {
                     egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " + scanResult.level));
-
-                    if (currentlayout.equals("quest")) {
-                        if ((scanResult.level > maxlev1) & (bss.indexOf(scanResult.BSSID.substring(0, 15))!=-1)) {
-
-                            maxlev1 = scanResult.level;
-                            rbssid1 = scanResult.BSSID;
-                            rssid1 = scanResult.SSID;
-                            cab = cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)));
-                        }
-                    }
                 }
 
                 Collections.sort(egug, Item.COMPARE_BY_STRENGTH);
-                ad.notifyDataSetChanged();
 
-                if (currentlayout.equals("quest")){
+                questact();
 
-                    TextView tq = findViewById(R.id.tquest);
-                    tq.setText("Вы находитесь внутри кабинета?");
-                    tts.speak("Вы находитесь внутри кабинета?", TextToSpeech.QUEUE_FLUSH, null);
-
-                    if (cab.equals(" ")) {
-                        tts.speak("Вы не находитесь в контролируемой территории", TextToSpeech.QUEUE_FLUSH, null);
-                        setContentView(R.layout.activity_main);
-                        currentlayout = "main";
-                    }
-                }
                 if (cab.equals(" ")) {
                     cab = "";
                 }
+
+                listact();
             }
         };
+
+        Runnable r = new Runnable(){
+            @Override
+            public void run() {
+                for (int i = 0; i < 1000; i++) {
+                    try {
+                        scan();
+                        potok.sleep(3000);
+                        if (currentlayout.equals("list")){
+                            potok.sleep(7000);
+                        }
+                    } catch (InterruptedException e) { }
+                }
+            }
+        };
+
+        Thread  potok = new Thread(r, "scaner");
 
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
