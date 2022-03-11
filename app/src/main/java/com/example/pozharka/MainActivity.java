@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
                         "2c:33:11:f8:86: 210\n" +
                         "cc:16:7e:96:cb: 211\n" +
                         "00:f6:63:97:19: 212\n" +
-                        "b8:11:4b:93:4a: 215\n" +
-                        "c0:c9:e3:08:bc: дом\n" +
+                        "b8:11:4b:93:4a: дом\n" +
+                        "c0:c9:e3:08:bc: 215\n" +
                         "c8:d3:ff:59:05: принтер";
 
                 fos = openFileOutput("bssids.txt", MODE_PRIVATE);
@@ -158,17 +158,18 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     //Запуск сканирования
                     potok.start();
+                    potok2.start();
                 }
             }
         }
 
         public void start(View view) {
+            if (!cab.equals(" ")) {
+                setContentView(R.layout.questions);
+                currentlayout = "quest";
 
-            setContentView(R.layout.questions);
-            currentlayout = "quest";
-
-            questact();
-
+                questact();
+            }
         }
 
         public void reset(View view) {
@@ -248,6 +249,12 @@ public class MainActivity extends AppCompatActivity {
             wifiManager.startScan();
         }
 
+        public void update() {
+            if (currentlayout.equals("main")){
+                //думаю
+            }
+        }
+
         public adap liw(){
 
             final adap adapter =  new adap(this, egug);
@@ -322,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
                 questact();
                 listact();
 
-                if (cab.equals(" ")) {
+                if (cab.equals(" ")){
                     cab = "";
                 }
             }
@@ -344,7 +351,17 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        Runnable r2 = new Runnable(){
+            @Override
+            public void run() {
+                while (true) {
+                    update();
+                }
+            }
+        };
+
         Thread  potok = new Thread(r, "scaner");
+        Thread  potok2 = new Thread(r2, "updater");
 
         //Обработка ответа пользователя на разрешение
         @Override
