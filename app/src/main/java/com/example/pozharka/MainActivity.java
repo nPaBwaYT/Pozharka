@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,16 +36,18 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-        public  ArrayList<Item> egug = new ArrayList<Item>();
+        public  ArrayList<Item> egug = new ArrayList<>();
         public  List<ScanResult> results;
         public  ArrayList<String> bss = new ArrayList<>();
         public  ArrayList<String> cabs = new ArrayList<>();
         public  String[] base = new String[]{" "};
+        public  ArrayList<Integer> numsl1 = new ArrayList<>();
+        public  ArrayList<Integer> numsl2 = new ArrayList<>();
 
         public int maxlev1 = -198;
-        public String rbssid1 =" ";
-        public String rssid1 =" ";
-        public String cab =" ";
+        public String cab = " ";
+
+        public boolean F = false;
 
         private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
 
@@ -104,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
                         "2c:33:11:f8:86: 210\n" +
                         "cc:16:7e:96:cb: 211\n" +
                         "00:f6:63:97:19: 212\n" +
-                        "b8:11:4b:93:4a: дом\n" +
-                        "c0:c9:e3:08:bc: 215\n" +
+                        "b8:11:4b:93:4a: 215\n" +
+                        "c0:c9:e3:08:bc: дом\n" +
                         "c8:d3:ff:59:05: принтер";
 
                 fos = openFileOutput("bssids.txt", MODE_PRIVATE);
@@ -127,9 +128,9 @@ public class MainActivity extends AppCompatActivity {
                 String text1 = new String(bytes);
                 String[] base = text1.split("\n");
 
-                for (int i = 0; i < base.length; i++) {
-                    bss.add(base[i].split(" ")[0]);
-                    cabs.add(base[i].split(" ")[1]);
+                for (String s : base) {
+                    bss.add(s.split(" ")[0]);
+                    cabs.add(s.split(" ")[1]);
                 }
             } catch (IOException ex) {}
             finally {
@@ -158,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     //Запуск сканирования
                     potok.start();
-                    potok2.start();
                 }
             }
         }
@@ -167,6 +167,11 @@ public class MainActivity extends AppCompatActivity {
             if (!cab.equals(" ")) {
                 setContentView(R.layout.questions);
                 currentlayout = "quest";
+
+                TextView tq = findViewById(R.id.tquest);
+
+                tq.setText("Вы находитесь внутри кабинета?");
+                tts.speak("Вы находитесь внутри кабинета?", TextToSpeech.QUEUE_FLUSH, null);
 
                 questact();
             }
@@ -178,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
             ImageView iv = findViewById(R.id.iv);
             iv.setImageResource(R.drawable.logo);
             leg.setImageResource(R.drawable.logo);
+            F = false;
         }
 
         public void gotolist(View view) {
@@ -216,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                     iv.setImageResource(holderint);
                     leg.setImageResource(R.drawable.legend);
 
-                    tts.speak("Вы находитесь в " + cab.toString()+ " кабинете", TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak("Вы находитесь в " + cab + " кабинете", TextToSpeech.QUEUE_FLUSH, null);
 
                     if (cab.equals("212") | cab.equals("213")){
                         tts.speak("Направляйтесь к выходу из кабинета, поверните налево, через несколько метров по левой стене вы увидите лестницу",
@@ -239,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
                                 TextToSpeech.QUEUE_FLUSH, null);
                     }
                 }
+                F = true;
                 currentlayout = "main";
             }
         }
@@ -249,10 +256,69 @@ public class MainActivity extends AppCompatActivity {
             wifiManager.startScan();
         }
 
-        public void update() {
-            if (currentlayout.equals("main")){
-                //думаю
+        //Порядковые номера элементов в списке egug с заданными кабинетами
+        public void getnumsl1(){
+            for (int i=0; i<egug.size(); i++) {
+                if (egug.get(i).getcab().substring(5).equals("дом")) {
+                    numsl1.add(i);
+                    break;
+                }
             }
+            for (int i=0; i<egug.size(); i++) {
+                if (egug.get(i).getcab().substring(5).equals("принтер")){
+                    numsl1.add(i);
+                    break;
+                }
+            }
+        }
+
+        //Порядковые номера элементов в списке egug с заданными кабинетами
+        public void getnumsl2(){
+            for (int i=0; i<egug.size(); i++) {
+                if (egug.get(i).getcab().substring(5).equals("дом")) {
+                    numsl2.add(i);
+                    break;
+                }
+            }
+            for (int i=0; i<egug.size(); i++) {
+                if (egug.get(i).getcab().substring(5).equals("принтер")){
+                    numsl2.add(i);
+                    break;
+                }
+            }
+        }
+
+        //Апдейт маршрутов и болтовня при дохождении до лестницы
+        public void update() {
+
+            getnumsl1();
+            getnumsl2();
+
+            try {
+                if (currentlayout.equals("main")) {
+
+                    ImageView iv = findViewById(R.id.iv);
+
+                    if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) -
+                                    Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 0) <= 8)) {
+
+                        iv.setImageResource(R.drawable.l_1);
+                        tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
+                        F = false;
+                    }
+                    else if ((F) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) -
+                            Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 0) <= 8)){
+
+                        iv.setImageResource(R.drawable.l_2);
+                        tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
+                        F = false;
+                    }
+                }
+            } catch (NumberFormatException e) {}
+
+            numsl1.clear();
         }
 
         public adap liw(){
@@ -277,10 +343,6 @@ public class MainActivity extends AppCompatActivity {
         public void questact() {
 
             if (currentlayout.equals("quest")) {
-                TextView tq = findViewById(R.id.tquest);
-
-                tq.setText("Вы находитесь внутри кабинета?");
-                tts.speak("Вы находитесь внутри кабинета?", TextToSpeech.QUEUE_FLUSH, null);
 
                 if (cab.equals(" ")) {
                     tts.speak("Вы не находитесь в контролируемой территории", TextToSpeech.QUEUE_FLUSH, null);
@@ -299,14 +361,12 @@ public class MainActivity extends AppCompatActivity {
                 unregisterReceiver(this);
 
                 maxlev1 = -198;
-                rbssid1 = " ";
-                rssid1 = " ";
                 cab = " ";
                 egug.clear();
 
                 //Загон всех Item'ов, содержащих резельтаты скана и кабинет, в массив egug
                 for (ScanResult scanResult : results) {
-                    if (!(bss.indexOf(scanResult.BSSID.substring(0, 15)) == -1)){
+                    if (bss.contains(scanResult.BSSID.substring(0, 15))){
                         egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " +
                                 scanResult.level, "cab: " +  cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)))));
                     }
@@ -328,6 +388,7 @@ public class MainActivity extends AppCompatActivity {
 
                 questact();
                 listact();
+                update();
 
                 if (cab.equals(" ")){
                     cab = "";
@@ -342,28 +403,19 @@ public class MainActivity extends AppCompatActivity {
                 while (true) {
                     try {
                         scan();
-                        potok.sleep(3000);
-                        if (currentlayout.equals("list")){
-                            potok.sleep(7000);
+                        potok.sleep(2300);
+                        if (currentlayout.equals("list")) {
+                            potok.sleep(700);
                         }
-                    } catch (InterruptedException e) {}
-                }
-            }
-        };
-
-        Runnable r2 = new Runnable(){
-            @Override
-            public void run() {
-                while (true) {
-                    update();
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
         };
 
         Thread  potok = new Thread(r, "scaner");
-        Thread  potok2 = new Thread(r2, "updater");
 
-        //Обработка ответа пользователя на разрешение
+    //Обработка ответа пользователя на разрешение
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
             switch (requestCode) {
