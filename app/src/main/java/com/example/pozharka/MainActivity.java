@@ -295,25 +295,30 @@ public class MainActivity extends AppCompatActivity {
             getnumsl2();
 
             try {
-                if ((currentlayout.equals("main")) & ((!numsl1.isEmpty()) | (!numsl2.isEmpty()))){
+                if (currentlayout.equals("main")) {
 
                     ImageView iv = findViewById(R.id.iv);
 
-                    if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) -
-                                    Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 0) <= 8)) {
+                    if (!numsl1.isEmpty()){
+                        if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
+                                (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) -
+                                Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 0) <= 8)) {
 
-                        iv.setImageResource(R.drawable.l_1);
-                        tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
-                        F = false;
+                            iv.setImageResource(R.drawable.l_1);
+                            tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
+                            F = false;
+                        }
                     }
-                    else if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) -
-                            Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 0) <= 8)){
 
-                        iv.setImageResource(R.drawable.l_2);
-                        tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
-                        F = false;
+                    if (!numsl2.isEmpty()){
+                        if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
+                                (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) -
+                                Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 0) <= 8)){
+
+                            iv.setImageResource(R.drawable.l_2);
+                            tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
+                            F = false;
+                        }
                     }
                 }
             } catch (NumberFormatException e) {}
