@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
             getnumsl2();
 
             try {
-                if (currentlayout.equals("main")) {
+                if ((currentlayout.equals("main")) & ((!numsl1.isEmpty()) | (!numsl2.isEmpty()))){
 
                     ImageView iv = findViewById(R.id.iv);
 
@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
                         F = false;
                     }
-                    else if ((F) &
+                    else if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) -
                             Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 0) <= 8)){
 
