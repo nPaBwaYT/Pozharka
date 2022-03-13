@@ -259,13 +259,13 @@ public class MainActivity extends AppCompatActivity {
     //Порядковые номера элементов в списке egug с заданными кабинетами
     public void getnumsl1(){
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("дом")) {
+            if (egug.get(i).getcab().substring(5).equals("212")) {
                 numsl1.add(i);
                 break;
             }
         }
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("принтер")){
+            if (egug.get(i).getcab().substring(5).equals("208")){
                 numsl1.add(i);
                 break;
             }
@@ -275,13 +275,13 @@ public class MainActivity extends AppCompatActivity {
     //Порядковые номера элементов в списке egug с заданными кабинетами
     public void getnumsl2(){
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("дом")) {
+            if (egug.get(i).getcab().substring(5).equals("215")) {
                 numsl2.add(i);
                 break;
             }
         }
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("принтер")){
+            if (egug.get(i).getcab().substring(5).equals("208")){
                 numsl2.add(i);
                 break;
             }
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!numsl1.isEmpty()){
                     if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
                             (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) -
-                            Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 0) <= 5)) {
+                            Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 0) <= 2)) {
 
                         iv.setImageResource(R.drawable.l_1);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!numsl2.isEmpty()){
                     if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) -
-                            Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 0) <= 5)){
+                            Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) - 1) <= 2)){
 
                         iv.setImageResource(R.drawable.l_2);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
