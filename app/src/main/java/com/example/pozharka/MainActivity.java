@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
                     scan();
                     potok.sleep(2300);
                     if (currentlayout.equals("list")) {
-                        potok.sleep(700);
+                        potok.sleep(3700);
                     }
                 } catch (InterruptedException e) {
                 }
