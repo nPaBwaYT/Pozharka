@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!numsl1.isEmpty()){
                     if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
                             (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) -
-                            Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 0) <= 2)) {
+                            Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) - 1) <= 2)) {
 
                         iv.setImageResource(R.drawable.l_1);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
