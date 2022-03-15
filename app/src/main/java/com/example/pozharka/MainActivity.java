@@ -148,19 +148,17 @@ public class MainActivity extends AppCompatActivity {
                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-        else { //Включение геолокации
-            LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            boolean geoloc = gps && nw;
-            if (! geoloc){
-                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            }
-            else{
-                //Запуск сканирования
-                potok.start();
-            }
+
+        //Включение геолокации
+        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        boolean geoloc = gps && nw;
+        if (! geoloc){
+            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         }
+
+        potok.start();
     }
 
     public void start(View view) {
@@ -430,6 +428,7 @@ public class MainActivity extends AppCompatActivity {
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
                 }
+
                 return;
             }
         }
