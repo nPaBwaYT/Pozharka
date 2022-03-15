@@ -263,6 +263,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         for (int i=0; i<egug.size(); i++) {
+            if (egug.get(i).getcab().substring(5).equals("210")) {
+                numsl1.add(i);
+                break;
+            }
+        }
+        for (int i=0; i<egug.size(); i++) {
             if (egug.get(i).getcab().substring(5).equals("208")){
                 numsl1.add(i);
                 break;
@@ -284,6 +290,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+        for (int i=0; i<egug.size(); i++) {
+            if (egug.get(i).getcab().substring(5).equals("205")){
+                numsl2.add(i);
+                break;
+            }
+        }
     }
 
     //Апдейт маршрутов и болтовня при дохождении до лестницы
@@ -297,21 +309,23 @@ public class MainActivity extends AppCompatActivity {
 
                 ImageView iv = findViewById(R.id.iv);
 
-                if (!numsl1.isEmpty()){
-                    if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) -
-                            Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) - 3) <= 2)) {
-
-                        iv.setImageResource(R.drawable.l_1);
+                if (!numsl1.isEmpty()){                                                               // |сигнал
+                    if ((F) &                                                                         //\/
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 60) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 60) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 60) <=3)) {
+                                                                                                      //     /\
+                        iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
                         F = false;
                     }
                 }
 
                 if (!numsl2.isEmpty()){
-                    if ((F) & //Условие разности сигналов из кабинетов под порядковыми номерами в списке numsl1 или numsl2 меньше 5
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) -
-                            Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) - 1) <= 2)){
+                    if ((F) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 60) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 60) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 60) <=3)) {
 
                         iv.setImageResource(R.drawable.l_2);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -408,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
                     scan();
                     potok.sleep(2300);
                     if (currentlayout.equals("list")) {
-                        potok.sleep(3700);
+                        potok.sleep(7700);
                     }
                 } catch (InterruptedException e) {
                 }
