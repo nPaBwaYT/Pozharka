@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("205")){
+            if (egug.get(i).getcab().substring(5).equals("206")){
                 numsl2.add(i);
                 break;
             }
@@ -311,9 +311,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl1.size()==3){                                                               // |сигнал
                     if ((F) &                                                                         //\/
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 60) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 60) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 60) <=3)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 75) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 63) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 73) <=3)) {
                                                                                                       //     /\
                         iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -323,9 +323,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl2.size()==3){
                     if ((F) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 60) <=3) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 66) <=3) &
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 60) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 60) <=3)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 49) <=3)) {
 
                         iv.setImageResource(R.drawable.l_2);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -384,8 +384,8 @@ public class MainActivity extends AppCompatActivity {
             //Загон всех Item'ов, содержащих резельтаты скана и кабинет, в массив egug
             for (ScanResult scanResult : results) {
                 if (bss.contains(scanResult.BSSID.substring(0, 15))){
-                    egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " +
-                            scanResult.level, "cab: " +  cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)))));
+                        egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " +
+                                scanResult.level, "cab: " + cabs.get(bss.indexOf(scanResult.BSSID.substring(0, 15)))));
                 }
                 else {
                     egug.add(new Item("SSID: " + scanResult.SSID, "BSSID: " + scanResult.BSSID, "strength: " +
