@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ImageView iv = findViewById(R.id.iv);
 
-                if (!numsl1.isEmpty()){                                                               // |сигнал
+                if (numsl1.size()==3){                                                               // |сигнал
                     if ((F) &                                                                         //\/
                             (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 60) <=3) &
                             (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 60) <=3) &
@@ -321,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if (!numsl2.isEmpty()){
+                if (numsl2.size()==3){
                     if ((F) &
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 60) <=3) &
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 60) <=3) &
