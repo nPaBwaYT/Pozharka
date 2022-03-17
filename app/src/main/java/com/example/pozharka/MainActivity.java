@@ -311,9 +311,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl1.size()==3){                                                               // |сигнал
                     if ((F) &                                                                         //\/
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=4)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
                                                                                                       //     /\
                         iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -323,9 +323,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl2.size()==3){
                     if ((F) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 67) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 61) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 50) <=4)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 67) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 61) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 50) <=6)) {
 
                         iv.setImageResource(R.drawable.l_2);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
