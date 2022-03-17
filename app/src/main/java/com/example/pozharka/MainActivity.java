@@ -148,17 +148,17 @@ public class MainActivity extends AppCompatActivity {
                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-
-        //Включение геолокации
-        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        boolean geoloc = gps && nw;
-        if (! geoloc){
-            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        else {
+            //Включение геолокации
+            LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            boolean geoloc = gps && nw;
+            if (! geoloc){
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+            potok.start();
         }
-
-        potok.start();
     }
 
     public void start(View view) {
@@ -311,9 +311,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl1.size()==3){                                                               // |сигнал
                     if ((F) &                                                                         //\/
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 75) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 63) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 73) <=3)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=4) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=4) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=4)) {
                                                                                                       //     /\
                         iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -323,9 +323,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl2.size()==3){
                     if ((F) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 66) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 60) <=3) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 49) <=3)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 67) <=4) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 61) <=4) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 50) <=4)) {
 
                         iv.setImageResource(R.drawable.l_2);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -441,6 +441,16 @@ public class MainActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(MainActivity.this,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                }
+                else{
+                    LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                    boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                    boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                    boolean geoloc = gps && nw;
+                    if (! geoloc){
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                    potok.start();
                 }
 
                 return;
