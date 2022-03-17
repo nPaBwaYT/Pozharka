@@ -22,11 +22,23 @@
 
     <Button
         android:id="@+id/y"
-        android:layout_width="220dp"
-        android:layout_height="100dp"
-        android:layout_marginBottom="40dp"
+        android:layout_width="120dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="20dp"
         android:onClick="yes"
-        android:text="ДА!"
+        android:text="Да"
+        app:layout_constraintBottom_toTopOf="@+id/dn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/dn"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="20dp"
+        android:onClick="yes"
+        android:text="Я не знаю"
         app:layout_constraintBottom_toTopOf="@+id/n"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -38,7 +50,7 @@
         android:layout_height="60dp"
         android:layout_marginBottom="40dp"
         android:onClick="goback"
-        android:text="нет"
+        android:text="Нет"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

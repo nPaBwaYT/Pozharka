@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     public String cab = " ";
 
     public boolean F = false;
+    public boolean geoloc = false;
+    public boolean gps = false;
+    public boolean nw = false;
 
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
 
@@ -151,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
         else {
             //Включение геолокации
             LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            boolean geoloc = gps && nw;
+            gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            geoloc = gps && nw;
             if (! geoloc){
                 startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             }
@@ -168,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
 
             TextView tq = findViewById(R.id.tquest);
 
-            tq.setText("Вы находитесь внутри кабинета?");
-            tts.speak("Вы находитесь внутри кабинета?", TextToSpeech.QUEUE_FLUSH, null);
+            tq.setText("Вы находитесь в " + cab + " кабинете?");
+            tts.speak("Вы находитесь в " + cab + " кабинете?", TextToSpeech.QUEUE_FLUSH, null);
 
             questact();
         }
@@ -196,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         currentlayout = "main";
+        tts.speak("Ищите ближайший план пожарной эвакуации и следуйте инструкциям, указанным на нём", TextToSpeech.QUEUE_FLUSH, null);
 
     }
 
@@ -219,8 +223,6 @@ public class MainActivity extends AppCompatActivity {
                         this.getPackageName());
                 iv.setImageResource(holderint);
                 leg.setImageResource(R.drawable.legend);
-
-                tts.speak("Вы находитесь в " + cab + " кабинете", TextToSpeech.QUEUE_FLUSH, null);
 
                 if (cab.equals("212") | cab.equals("213")){
                     tts.speak("Направляйтесь к выходу из кабинета, поверните налево, через несколько метров по левой стене вы увидите лестницу",
@@ -311,9 +313,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl1.size()==3){                                                               // |сигнал
                     if ((F) &                                                                         //\/
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=4)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
                                                                                                       //     /\
                         iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -323,9 +325,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl2.size()==3){
                     if ((F) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 67) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 61) <=4) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 50) <=4)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 67) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 61) <=6) &
+                            (Math.abs(Integer.valueOf(egug.get(numsl2.get(2)).strength.substring(10)) + 50) <=6)) {
 
                         iv.setImageResource(R.drawable.l_2);
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -336,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (NumberFormatException e) {}
 
         numsl1.clear();
+        numsl2.clear();
     }
 
     public adap liw(){
@@ -413,24 +416,39 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    public LocationManager lmm(){
+        LocationManager LoM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        return LoM;
+    }
+
     //Поток (фоновое сканирование)
     Runnable r = new Runnable(){
         @Override
         public void run() {
             while (true) {
-                try {
-                    scan();
-                    potok.sleep(2300);
-                    if (currentlayout.equals("list")) {
-                        potok.sleep(7700);
+                if (! geoloc) {
+                    LocationManager lm = lmm();
+                    gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                    nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                    geoloc = gps && nw;
+                }
+                if (geoloc) {
+                    try {
+                        scan();
+                        potok.sleep(2300);
+                        if (currentlayout.equals("list")) {
+                            potok.sleep(7700);
+                        }
+                    } catch (InterruptedException e) {
                     }
-                } catch (InterruptedException e) {
                 }
             }
         }
     };
 
     Thread  potok = new Thread(r, "scaner");
+
+
 
     //Обработка ответа пользователя на разрешение
     @Override
@@ -444,9 +462,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                    boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                    boolean nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-                    boolean geoloc = gps && nw;
+                    gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                    nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                    geoloc = gps && nw;
                     if (! geoloc){
                         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
