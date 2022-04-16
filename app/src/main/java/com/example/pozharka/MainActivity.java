@@ -110,7 +110,9 @@ public class MainActivity extends AppCompatActivity {
                     "00:f6:63:97:19: 212\n" +
                     "b8:11:4b:93:4a: 215\n" +
                     "c0:c9:e3:08:bc: дом\n" +
-                    "c8:d3:ff:59:05: принтер";
+                    "c8:d3:ff:59:05: принтер\n" +
+                    "00:00:00:00:00: Выход\n" +
+                    "00:00:00:00:01: А-321";
 
             fos = openFileOutput("bssids.txt", MODE_PRIVATE);
             fos.write(text.getBytes());
@@ -171,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
             TextView tq = findViewById(R.id.tquest);
 
-            tq.setText("Вы находитесь в " + cab + " кабинете?");
-            tts.speak("Вы находитесь в " + cab + " кабинете?", TextToSpeech.QUEUE_FLUSH, null);
+            tq.setText("Вы находитесь в кабинете " + cab + "?");
+            tts.speak("Вы находитесь в кабинете " + cab + "?", TextToSpeech.QUEUE_FLUSH, null);
 
             questact();
         }
@@ -184,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView iv = findViewById(R.id.iv);
         iv.setImageResource(R.drawable.logo);
         leg.setImageResource(R.drawable.logo);
+        tts.speak(" ", TextToSpeech.QUEUE_FLUSH, null);
         F = false;
     }
 
@@ -244,6 +247,10 @@ public class MainActivity extends AppCompatActivity {
                     tts.speak("Направляйтесь к выходу из кабинета, поверните направо, через несколько метров по правой стене вы увидите лестницу",
                             TextToSpeech.QUEUE_FLUSH, null);
                 }
+                if (cab.equals("А-321")) {
+                    tts.speak("зхзххзхзхзхзххзхзхзхзхзхзхз",
+                            TextToSpeech.QUEUE_FLUSH, null);
+                }
             }
             F = true;
             currentlayout = "main";
@@ -259,12 +266,12 @@ public class MainActivity extends AppCompatActivity {
     //Порядковые номера элементов в списке egug с заданными кабинетами
     public void getnumsl1(){
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("212")) {
+            if (egug.get(i).getcab().substring(5).equals("Выход")) {
                 numsl1.add(i);
                 break;
             }
         }
-        for (int i=0; i<egug.size(); i++) {
+        /*for (int i=0; i<egug.size(); i++) {
             if (egug.get(i).getcab().substring(5).equals("210")) {
                 numsl1.add(i);
                 break;
@@ -275,12 +282,12 @@ public class MainActivity extends AppCompatActivity {
                 numsl1.add(i);
                 break;
             }
-        }
+        }*/
     }
 
     //Порядковые номера элементов в списке egug с заданными кабинетами
     public void getnumsl2(){
-        for (int i=0; i<egug.size(); i++) {
+        /*for (int i=0; i<egug.size(); i++) {
             if (egug.get(i).getcab().substring(5).equals("215")) {
                 numsl2.add(i);
                 break;
@@ -297,14 +304,14 @@ public class MainActivity extends AppCompatActivity {
                 numsl2.add(i);
                 break;
             }
-        }
+        }*/
     }
 
     //Апдейт маршрутов и болтовня при дохождении до лестницы
     public void update() {
 
         getnumsl1();
-        getnumsl2();
+        //getnumsl2();
 
         try {
             if (currentlayout.equals("main")) {
@@ -313,9 +320,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (numsl1.size()==3){                                                               // |сигнал
                     if ((F) &                                                                         //\/
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=6) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
+                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=6)){
+                            //(Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
+                            //(Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
                                                                                                       //     /\
                         iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
@@ -323,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if (numsl2.size()==3){
+                /*if (numsl2.size()==3){
                     if ((F) &
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(0)).strength.substring(10)) + 67) <=6) &
                             (Math.abs(Integer.valueOf(egug.get(numsl2.get(1)).strength.substring(10)) + 61) <=6) &
@@ -333,12 +340,12 @@ public class MainActivity extends AppCompatActivity {
                         tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
                         F = false;
                     }
-                }
+                }*/
             }
         } catch (NumberFormatException e) {}
 
         numsl1.clear();
-        numsl2.clear();
+        //numsl2.clear();
     }
 
     public adap liw(){
