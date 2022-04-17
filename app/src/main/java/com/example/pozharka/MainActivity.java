@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
                     "b8:11:4b:93:4a: 215\n" +
                     "c0:c9:e3:08:bc: дом\n" +
                     "c8:d3:ff:59:05: принтер\n" +
-                    "00:00:00:00:00: Выход\n" +
-                    "00:00:00:00:01: А-321";
+                    "e2:aa:d4:15:08: Выход\n" +
+                    "62:1e:28:a2:60: А-321";
 
             fos = openFileOutput("bssids.txt", MODE_PRIVATE);
             fos.write(text.getBytes());
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ImageView iv = findViewById(R.id.iv);
 
-                if (numsl1.size()==3){                                                               // |сигнал
+                if (numsl1.size()==1){                                                               // |сигнал
                     if ((F) &                                                                         //\/
                             (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=6)){
                             //(Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
