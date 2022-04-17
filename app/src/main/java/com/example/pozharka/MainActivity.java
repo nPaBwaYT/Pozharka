@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.net.wifi.ScanResult;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,6 +37,17 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+    public LocationManager lm;
+    public WifiManager wifiManager;
+    public adap ad;
+
+    public ImageView leg;
+    public ImageView iv;
+    public TextView tq;
+    public ListView lw;
+
+    public Thread potok;
 
     public  ArrayList<Item> egug = new ArrayList<>();
     public  List<ScanResult> results;
@@ -63,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        ad = new adap(this, egug);
+
+        tq = findViewById(R.id.tquest);
+        leg = findViewById(R.id.legend);
+        iv = findViewById(R.id.iv);
+        lw = findViewById(R.id.wifilist);
+
+        potok = new Thread(r, "scaner");
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Полноэкранный режим
@@ -73,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
-
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         //Инициализация ттс
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
@@ -95,14 +117,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        }
-
         //Создание файла-базы (по-хорошему поменять бы способ создания)
         FileOutputStream fos = null;
         try {
-            String text = "00:f6:63:d7:31: 206\n" +
+            String text =
+                    "00:f6:63:d7:31: 206\n" +
                     "cc:16:7e:aa:f1: 208\n" +
                     "00:81:c4:73:bf: 209\n" +
                     "2c:33:11:f8:86: 210\n" +
@@ -111,8 +130,9 @@ public class MainActivity extends AppCompatActivity {
                     "b8:11:4b:93:4a: 215\n" +
                     "c0:c9:e3:08:bc: дом\n" +
                     "c8:d3:ff:59:05: принтер\n" +
-                    "00:00:00:00:00: Выход\n" +
-                    "00:00:00:00:01: А-321";
+                    "e2:aa:d4:15:08: Выход\n" +
+                    "62:1e:28:a2:60: А-321";
+
 
             fos = openFileOutput("bssids.txt", MODE_PRIVATE);
             fos.write(text.getBytes());
@@ -147,15 +167,15 @@ public class MainActivity extends AppCompatActivity {
 
         //Запрос разрешения
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-               && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-           ActivityCompat.requestPermissions(MainActivity.this,
-                   new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                   MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+
         else {
             //Включение геолокации
-            LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
             nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             geoloc = gps && nw;
@@ -171,8 +191,7 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.questions);
             currentlayout = "quest";
 
-            TextView tq = findViewById(R.id.tquest);
-
+            tq=findViewById(R.id.tquest);
             tq.setText("Вы находитесь в кабинете " + cab + "?");
             tts.speak("Вы находитесь в кабинете " + cab + "?", TextToSpeech.QUEUE_FLUSH, null);
 
@@ -182,8 +201,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void reset(View view) {
 
-        ImageView leg = findViewById(R.id.legend);
-        ImageView iv = findViewById(R.id.iv);
+        leg = findViewById(R.id.legend);
+        iv = findViewById(R.id.iv);
+
         iv.setImageResource(R.drawable.logo);
         leg.setImageResource(R.drawable.logo);
         tts.speak(" ", TextToSpeech.QUEUE_FLUSH, null);
@@ -203,7 +223,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         currentlayout = "main";
         tts.speak("Ищите ближайший план пожарной эвакуации и следуйте инструкциям, указанным на нём", TextToSpeech.QUEUE_FLUSH, null);
+    }
 
+    public void gobackfromlist(View view) {
+
+        setContentView(R.layout.activity_main);
+        currentlayout = "main";
     }
 
     public void zhighoul(View view) {
@@ -215,11 +240,11 @@ public class MainActivity extends AppCompatActivity {
     public void yes(View view) {
         if ((! cab.equals(" ")) & (currentlayout.equals("quest"))){
             setContentView(R.layout.activity_main);
+            leg = findViewById(R.id.legend);
+            iv = findViewById(R.id.iv);
 
             //Разговоры и вывод маршрута
             if (! cab.equals("")) {
-                ImageView iv = findViewById(R.id.iv);
-                ImageView leg = findViewById(R.id.legend);
 
                 String imgname = "cab_" + cab;
                 int holderint = getResources().getIdentifier(imgname, "drawable",
@@ -258,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void scan() {
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
     }
@@ -310,22 +334,23 @@ public class MainActivity extends AppCompatActivity {
     //Апдейт маршрутов и болтовня при дохождении до лестницы
     public void update() {
 
+        iv = findViewById(R.id.iv);
+
         getnumsl1();
         //getnumsl2();
 
         try {
             if (currentlayout.equals("main")) {
 
-                ImageView iv = findViewById(R.id.iv);
 
-                if (numsl1.size()==3){                                                               // |сигнал
-                    if ((F) &                                                                         //\/
-                            (Math.abs(Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) + 76) <=6)){
+                if (numsl1.size()==1){
+                    if ((F) &
+                            (Integer.valueOf(egug.get(numsl1.get(0)).strength.substring(10)) >= -41)){
                             //(Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
                             //(Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
-                                                                                                      //     /\
-                        iv.setImageResource(R.drawable.l_1);                                          //      |погрешность
-                        tts.speak("Вы дошли до лестницы", TextToSpeech.QUEUE_FLUSH, null);
+
+                        iv.setImageResource(R.drawable.l_1);
+                        tts.speak("Вы находитесь недалеко от выхода", TextToSpeech.QUEUE_FLUSH, null);
                         F = false;
                     }
                 }
@@ -348,18 +373,12 @@ public class MainActivity extends AppCompatActivity {
         //numsl2.clear();
     }
 
-    public adap liw(){
-
-        final adap adapter =  new adap(this, egug);
-
-        return (adapter);
-    }
 
     //Код вкладки списка
     public void listact(){
         if (currentlayout.equals("list")) {
-            adap ad = liw();
-            ListView lw = findViewById(R.id.wifilist);
+
+            lw = findViewById(R.id.wifilist);
             lw.setAdapter(ad);
 
             ad.notifyDataSetChanged();
@@ -383,7 +402,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             results = wifiManager.getScanResults();
             unregisterReceiver(this);
 
@@ -420,13 +438,11 @@ public class MainActivity extends AppCompatActivity {
             if (cab.equals(" ")){
                 cab = "";
             }
+
+            Log.wtf("scan", "poluchen");
         }
     };
 
-    public LocationManager lmm(){
-        LocationManager LoM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        return LoM;
-    }
 
     //Поток (фоновое сканирование)
     Runnable r = new Runnable(){
@@ -434,17 +450,17 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             while (true) {
                 if (! geoloc) {
-                    LocationManager lm = lmm();
                     gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
                     nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
                     geoloc = gps && nw;
                 }
                 if (geoloc) {
                     try {
+                        Log.wtf("scan", "nachat");
                         scan();
-                        potok.sleep(2300);
+                        potok.sleep(1000);
                         if (currentlayout.equals("list")) {
-                            potok.sleep(7700);
+                            potok.sleep(1000);
                         }
                     } catch (InterruptedException e) {
                     }
@@ -453,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    Thread  potok = new Thread(r, "scaner");
+
 
 
 
@@ -468,7 +484,6 @@ public class MainActivity extends AppCompatActivity {
                             MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
                 }
                 else{
-                    LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
                     gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
                     nw = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
                     geoloc = gps && nw;
