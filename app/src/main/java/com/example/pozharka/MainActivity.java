@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
                     "b8:11:4b:93:4a: 215\n" +
                     "c0:c9:e3:08:bc: дом\n" +
                     "c8:d3:ff:59:05: принтер\n" +
-                    "e2:aa:d4:15:08: Лестница\n" +
-                    "62:1e:28:a2:60: А-321";
+                    "e2:aa:d4:15:08: exit\n" +
+                    "62:1e:28:a2:60: a321";
 
 
             fos = openFileOutput("bssids.txt", MODE_PRIVATE);
@@ -231,12 +231,6 @@ public class MainActivity extends AppCompatActivity {
         currentlayout = "main";
     }
 
-    public void zhighoul(View view) {
-        tts.speak("uvu давай заведем старый жигуль? " +
-                "вивививививививививививививививививививививививививививививививививививививививививививививививививививипрпрпррпрвививививививививививививи " +
-                "Марат Радикович не сидите давайте помогайте до гаража толкать может там он заведётся.]", TextToSpeech.QUEUE_FLUSH, null);
-    }
-
     public void yes(View view) {
         if ((! cab.equals(" ")) & (currentlayout.equals("quest"))){
             setContentView(R.layout.activity_main);
@@ -272,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                     tts.speak("Направляйтесь к выходу из кабинета, поверните направо, через несколько метров по правой стене вы увидите лестницу",
                             TextToSpeech.QUEUE_FLUSH, null);
                 }
-                if (cab.equals("А-321")) {
+                if (cab.equals("a321")) {
                     tts.speak("Направляйтесь к выходу из аудитории, поверните напрово, через несколько метров по правой стене вы увидите лестницу",
                             TextToSpeech.QUEUE_FLUSH, null);
                 }
@@ -290,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
     //Порядковые номера элементов в списке egug с заданными кабинетами
     public void getnumsl1(){
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("Лестница")) {
+            if (egug.get(i).getcab().substring(5).equals("exit")) {
                 numsl1.add(i);
                 break;
             }
@@ -349,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
                             //(Math.abs(Integer.valueOf(egug.get(numsl1.get(1)).strength.substring(10)) + 64) <=6) &
                             //(Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
 
-                        iv.setImageResource(R.drawable.l_1);
+                        iv.setImageResource(R.drawable.exit);
                         tts.speak("Вы находитесь недалеко от лестницы", TextToSpeech.QUEUE_FLUSH, null);
                         F = false;
                     }
@@ -468,9 +462,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
-
-
 
 
     //Обработка ответа пользователя на разрешение
