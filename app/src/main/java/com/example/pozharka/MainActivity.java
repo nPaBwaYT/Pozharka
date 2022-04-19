@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     "b8:11:4b:93:4a: 215\n" +
                     "c0:c9:e3:08:bc: дом\n" +
                     "c8:d3:ff:59:05: принтер\n" +
-                    "e2:aa:d4:15:08: Выход\n" +
+                    "e2:aa:d4:15:08: Лестница\n" +
                     "62:1e:28:a2:60: А-321";
 
 
@@ -192,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
             currentlayout = "quest";
 
             tq=findViewById(R.id.tquest);
-            tq.setText("Вы находитесь в кабинете " + cab + "?");
-            tts.speak("Вы находитесь в кабинете " + cab + "?", TextToSpeech.QUEUE_FLUSH, null);
+            tq.setText("Вы находитесь в аудитории " + cab + "?");
+            tts.speak("Вы находитесь в аудитории " + cab + "?", TextToSpeech.QUEUE_FLUSH, null);
 
             questact();
         }
@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                             TextToSpeech.QUEUE_FLUSH, null);
                 }
                 if (cab.equals("А-321")) {
-                    tts.speak("зхзххзхзхзхзххзхзхзхзхзхзхз",
+                    tts.speak("Направляйтесь к выходу из аудитории, поверните напрово, через несколько метров по правой стене вы увидите лестницу",
                             TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
     //Порядковые номера элементов в списке egug с заданными кабинетами
     public void getnumsl1(){
         for (int i=0; i<egug.size(); i++) {
-            if (egug.get(i).getcab().substring(5).equals("Выход")) {
+            if (egug.get(i).getcab().substring(5).equals("Лестница")) {
                 numsl1.add(i);
                 break;
             }
@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
                             //(Math.abs(Integer.valueOf(egug.get(numsl1.get(2)).strength.substring(10)) + 74) <=6)) {
 
                         iv.setImageResource(R.drawable.l_1);
-                        tts.speak("Вы находитесь недалеко от выхода", TextToSpeech.QUEUE_FLUSH, null);
+                        tts.speak("Вы находитесь недалеко от лестницы", TextToSpeech.QUEUE_FLUSH, null);
                         F = false;
                     }
                 }
